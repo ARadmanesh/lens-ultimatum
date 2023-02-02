@@ -1,7 +1,7 @@
 {
-  "name": "myapp",
+  "name": "lens.ultimatum",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "4.x",
@@ -21,7 +21,8 @@
     "react-scripts": "4.0.3"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
+    "start": "react-scripts start",
+    "dev": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
