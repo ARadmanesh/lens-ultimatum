@@ -13,6 +13,7 @@
     "react": "16.14.x",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
+    "react-dnd-touch-backend": "^16.0.1",
     "react-dom": "16.14.x",
     "react-i18next": "^11.3.4",
     "react-markdown": "^4.3.1",
@@ -42,9 +43,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "eslint": "^8.33.0",
-    "eslint-plugin-react": "^7.32.2"
   }
 }

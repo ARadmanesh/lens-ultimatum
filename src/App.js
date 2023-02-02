@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect, useCallback, memo} from "react";
 //import ReactDOM from "react-dom";
 import {
   Typography,
@@ -17,6 +17,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { ltrTheme } from "./utils/theme";
+import { DndProvider, useDrag , useDrop} from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const theme = ltrTheme;
 
@@ -34,8 +36,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function App() {
+// Item types of draggable components which now are only one type
+const ItemTypes = {
+  OPPONENT: 'opponent',
+  POT: 'pot',
+  PLAYER: 'player',
+}
+
+export default function App() {
   const classes = useStyles();
+  const tokens = 10;
+  const [boxes, setBoxes] = useState(
+    [
+      {name: ItemTypes.PLAYER , amount : 0, accepts: [ItemTypes.POT, ItemTypes.OPPONENT]},
+      {name: ItemTypes.POT , amount : tokens, accepts: [ItemTypes.PLAYER, ItemTypes.OPPONENT]},
+      {name: ItemTypes.OPPONENT , amount : 0, accepts: [ItemTypes.POT, ItemTypes.PLAYER]},
+    ]
+  );
+
+  /***
+   * token has been moved by player to a different box
+   */
+  const handleDrop = useCallback(
+    (name, item) => {
+      // item is the entity that is dropped and has {name, boxName}
+      // name is the name of the repositoryBox that entity has been dropped into
+      const fromBox = item.boxName;
+      const destBox = name;
+      //console.log('dropped on: ',destBox);
+      //console.log('from : ',fromBox);
+      setBoxes(boxes.map(item => {
+        if(item.name === fromBox){
+          return {...item, amount: item.amount-1};
+        }else if(item.name === destBox){
+          return {...item, amount: item.amount+1};
+        }else{
+          return item;
+        }
+      }));
+    },
+    [boxes],
+  )
+
   return (
     <ThemeProvider theme={theme}>
       <div>
@@ -63,6 +105,17 @@ function App() {
                       <Typography color='textSecondary' variant='caption'>Trial: 1 of 3</Typography>
                     </Grid></Grid>
                   </Grid>
+                  <DndProvider backend={HTML5Backend}>
+                    {boxes.map(({name, amount, accepts}, index) => (
+                      <RepositoryBox
+                        accept={accepts}
+                        name={name}
+                        amount={amount}
+                        onDrop={(item) => handleDrop(name, item)}
+                        key={index}
+                      />
+                    ))}
+
                   {/* Box */}
                     <Grid item xs={12} spacing={2}>
                       <Paper className={classes.paper} elevation={3}>
@@ -79,7 +132,7 @@ function App() {
                             <Typography variant="body2" color="textSecondary" component="p">Nurse</Typography>
                           </Grid>
                           <Grid item xs={8}  justifyContent="center" alignItems="center">
-                            <Box height={1}>
+                            <Box height={1}  justifyContent="center" alignItems="center">
                               <MonetizationOnIcon key="1" />
                               <MonetizationOnIcon key="2" />
                               <MonetizationOnIcon key="3" />
@@ -144,6 +197,7 @@ function App() {
                         </Grid>
                       </Paper>
                     </Grid>
+                  </DndProvider>
 
                   <Grid item container direction="row" justify="space-around" alignItems='center'>
                     <Button size='large' color='primary' variant='outlined' onClick={()=> {console.log('finish')}}>finish</Button>
@@ -159,4 +213,85 @@ function App() {
     </ThemeProvider>
   );
 }
-export default App;
+
+/***
+ * Container box for monetized entities and their interactions
+ */
+const RepositoryBox = memo(function RepositoryBox({
+  name,
+  amount,
+  onDrop,
+  accept,
+})
+{
+  const style = {
+    lineHeight: 'normal',
+  }
+
+  const [{ canDrop, isOver }, drop] = useDrop({
+    accept,
+    drop: onDrop,
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+      //connectDropTarget: connect.dropTarget()
+    }),
+  })
+
+  const isActive = canDrop && isOver
+  let backgroundColor = '#222'
+  if (isActive) {
+    backgroundColor = 'darkgreen'
+  } else if (canDrop) {
+    backgroundColor = 'darkkhaki'
+  }
+
+  const tokensList = [];
+  for(let i=0; i < amount; i++) {
+    tokensList.push(<MonetizedToken type={name} name={name+i.toString()} key={name+i.toString()} boxName={name} />);
+  }
+
+  return (
+    <Grid ref={drop} item xs={12} style={{ ...style, backgroundColor }} data-test-id={"repository"+name} >
+      <Paper className='view-container'>
+        <Grid container>
+          <Grid item xs={12}>
+            <Typography>{name} ({amount})</Typography>
+            {isActive ? 'release to drop' : ''}
+          </Grid>
+          <Grid item xs={12}>
+              {tokensList}
+          </Grid>
+        </Grid>
+      </Paper>
+    </Grid>
+  );
+})
+
+/***
+ * Component which renders coin tokens and handles dragging events
+ */
+const MonetizedToken = memo(function MonetizedToken({type, name, boxName}) {
+
+  const style = {
+    cursor: 'move',
+    color: 'black'
+  }
+
+  const [{ opacity }, drag] = useDrag(
+    () => ({
+      type,
+      item: { name, boxName },
+      collect: (monitor) => ({
+        opacity: monitor.isDragging() ? 0.4 : 1,
+      }),
+    }),
+    [name],
+  )
+  return (
+    <span ref={drag} data-test-id={`token`}>
+      <MonetizationOnIcon style={{ ...style, opacity }} />
+    </span>
+  )
+
+})
