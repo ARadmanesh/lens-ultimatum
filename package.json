@@ -1,7 +1,9 @@
 {
-  "name": "lens.ultimatum",
-  "version": "0.1.0",
+  "name": "lens-ultimatum",
+  "version": "0.2.0",
   "private": false,
+  "homepage": "https://codesandbox.io/s/4j7m47vlm4",
+  "main": "index.js",
   "dependencies": {
     "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "4.x",
