@@ -17,6 +17,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { ltrTheme } from "./utils/theme";
+import { TouchBackend } from 'react-dnd-touch-backend'
 import { DndProvider, useDrag , useDrop} from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -105,7 +106,7 @@ export default function App() {
                       <Typography color='textSecondary' variant='caption'>Trial: 1 of 3</Typography>
                     </Grid></Grid>
                   </Grid>
-                  <DndProvider backend={HTML5Backend}>
+                  <DndProvider backend={TouchBackend} options={{enableMouseEvents: true}}>
                     {boxes.map(({name, amount, accepts}, index) => (
                       <RepositoryBox
                         accept={accepts}
