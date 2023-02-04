@@ -14,12 +14,16 @@ import {
   Badge
 } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
+import { sizing } from '@material-ui/system';
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { ltrTheme } from "./utils/theme";
-import { TouchBackend } from 'react-dnd-touch-backend'
 import { DndProvider, useDrag , useDrop} from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend'
 import { HTML5Backend } from 'react-dnd-html5-backend';
+
+//css
+import "./app.css";
 
 const theme = ltrTheme;
 
@@ -35,7 +39,11 @@ const useStyles = makeStyles((theme) => ({
     width: theme.spacing(7),
     height: theme.spacing(7),
   },
+  height100: {
+    height: '100%',
+  }
 }));
+
 
 // Item types of draggable components which now are only one type
 const ItemTypes = {
@@ -97,8 +105,8 @@ export default function App() {
             <Grid item>
               <Paper className="view-container">
                 {/* Here the study view starts */}
-                <Grid container direction='column' spacing={2} alignItems='stretch' justify-contents='flex-start' className='ultimatum-container'>
-                  <Grid item>
+                <Grid container direction='column' spacing={2} className='ultimatum-container'>
+                  <Grid item spacing={12}>
                     <Typography variant="h4">rule description</Typography>
                   </Grid>
                   <Grid item container direction='row' justify="space-around" alignItems='center'>
@@ -116,6 +124,7 @@ export default function App() {
                         key={index}
                       />
                     ))}
+                  </DndProvider>
 
                   {/* Box */}
                     <Grid item xs={12} spacing={2}>
@@ -124,7 +133,7 @@ export default function App() {
                           <Grid item>
                             <Typography aligin>Player (12)</Typography>
                           </Grid>
-                        </Grid>    
+                        </Grid>
                         <Grid container direction="row">
                           <Grid item xs={4}>
                             <Avatar alt="Marry Stone" src="/images/avatars/marry-avatar.jpg" className={classes.large} />
@@ -155,12 +164,12 @@ export default function App() {
                           <Grid item>
                             <Typography aligin>Total: 12</Typography>
                           </Grid>
-                        </Grid>    
+                        </Grid>
                       </Paper>
                     </Grid>
                   {/* Box */}
                     <Grid item xs={12}>
-                      <Paper className="">
+                      <Paper className={classes.paper}>
                         <Grid container>
                           <Grid item xs={12}>
                             <Typography>Pot (4)</Typography>
@@ -198,7 +207,6 @@ export default function App() {
                         </Grid>
                       </Paper>
                     </Grid>
-                  </DndProvider>
 
                   <Grid item container direction="row" justify="space-around" alignItems='center'>
                     <Button size='large' color='primary' variant='outlined' onClick={()=> {console.log('finish')}}>finish</Button>
@@ -225,6 +233,7 @@ const RepositoryBox = memo(function RepositoryBox({
   accept,
 })
 {
+  const classes = useStyles();
   const style = {
     lineHeight: 'normal',
   }
@@ -253,15 +262,26 @@ const RepositoryBox = memo(function RepositoryBox({
   }
 
   return (
-    <Grid ref={drop} item xs={12} style={{ ...style, backgroundColor }} data-test-id={"repository"+name} >
-      <Paper className='view-container'>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography>{name} ({amount})</Typography>
-            {isActive ? 'release to drop' : ''}
+    <Grid item xs={12}>
+      <Paper ref={drop} className={classes.paper} style={{ ...style, backgroundColor }} elevation={3} >
+        <Grid container direction="row">
+          <Grid item xs={4}>
+            {name === ItemTypes.OPPONENT &&
+              <OpponentInfoBar />
+            }
+            {name !== ItemTypes.OPPONENT &&
+              <Typography>{name}</Typography>
+            }
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8}>
+            <Grid container direction="row" justifyContent="felx-start" alignItems="center" className={classes.height100}>
               {tokensList}
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid container direction='row' justifyContent="flex-end" alignItems='center'>
+          <Grid item>
+            <Typography variant="body2" color="textSecondary" component="span">Total: {amount}</Typography>
           </Grid>
         </Grid>
       </Paper>
@@ -269,30 +289,44 @@ const RepositoryBox = memo(function RepositoryBox({
   );
 })
 
+const OpponentInfoBar = memo(function OpponentInfoBar(){
+  const classes = useStyles();
+  return (
+    <>
+      <Avatar alt="Marry Stone" src="/images/avatars/marry-avatar.jpg" className={classes.large} />
+      <Typography variant="body1" color="textPrimary" component="p"> Marry Stone</Typography>
+      <Typography variant="body2" color="textSecondary" component="p">27 years old</Typography>
+      <Typography variant="body2" color="textSecondary" component="p">Nurse</Typography>
+    </>
+  );
+})
 /***
  * Component which renders coin tokens and handles dragging events
  */
 const MonetizedToken = memo(function MonetizedToken({type, name, boxName}) {
-
+  const classes = useStyles();
   const style = {
     cursor: 'move',
     color: 'black'
   }
 
-  const [{ opacity }, drag] = useDrag(
+  const [collected, drag, dragPreview] = useDrag(
     () => ({
       type,
       item: { name, boxName },
-      collect: (monitor) => ({
-        opacity: monitor.isDragging() ? 0.4 : 1,
-      }),
-    }),
-    [name],
+    })
   )
-  return (
-    <span ref={drag} data-test-id={`token`}>
-      <MonetizationOnIcon style={{ ...style, opacity }} />
+  return collected.isDragging ? (
+   <Grid item><MonetizationOnIcon ref={dragPreview} style={{ opacity: 0.5}} /></Grid>
+  ) : (
+    <Grid item><MonetizationOnIcon ref={drag} {...collected} role="Handle" data-test-id={`token`} /> </Grid>
+  )
+    {/*
+    <span ref={dragPreview} style={...style,{ opacity: isDragging ? 0.5 : 1}}>
+      <span ref={drag} role="Handle" data-test-id={`token`}>
+        <MonetizationOnIcon  />
+      </span>
     </span>
-  )
+    */}
 
 })
