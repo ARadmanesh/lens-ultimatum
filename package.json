@@ -2,13 +2,13 @@
   "name": "lens-ultimatum",
   "version": "0.2.0",
   "private": false,
-  "homepage": "https://codesandbox.io/s/4j7m47vlm4",
+  "homepage": "https://ARadmanesh.github.io/lens",
   "main": "index.js",
   "dependencies": {
     "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "4.x",
     "@material-ui/lab": "4.0.0-alpha.49",
-    "gh-pages": "2.x",
+    "gh-pages": "3.x",
     "i18next": "^19.3.4",
     "i18next-xhr-backend": "^3.2.2",
     "material-ui-image": "^3.2.3",
@@ -24,8 +24,10 @@
     "react-scripts": "4.0.3"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
-    "dev": "react-scripts --openssl-legacy-provider start",
+    "startdev": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
