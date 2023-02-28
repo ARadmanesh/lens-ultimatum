@@ -13,6 +13,7 @@ import {
   Badge
 } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
+import { grey, blueGrey, teal } from '@material-ui/core/colors';
 import { sizing } from '@material-ui/system';
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
@@ -56,9 +57,9 @@ export default function App() {
   const tokens = 10;
   const [boxes, setBoxes] = useState(
     [
-      {name: ItemTypes.PLAYER , amount : 0, accepts: [ItemTypes.POT, ItemTypes.OPPONENT]},
-      {name: ItemTypes.POT , amount : tokens, accepts: [ItemTypes.PLAYER, ItemTypes.OPPONENT]},
       {name: ItemTypes.OPPONENT , amount : 0, accepts: [ItemTypes.POT, ItemTypes.PLAYER]},
+      {name: ItemTypes.POT , amount : tokens, accepts: [ItemTypes.PLAYER, ItemTypes.OPPONENT]},
+      {name: ItemTypes.PLAYER , amount : 0, accepts: [ItemTypes.POT, ItemTypes.OPPONENT]},
     ]
   );
 
@@ -295,7 +296,28 @@ const RepositoryBox = memo(function RepositoryBox({
   accept,
 })
 {
+  const badgeStyles = makeStyles((theme) => ({
+    root: {
+      display: 'flex',
+      '& > *': {
+        margin: theme.spacing(1),
+      },
+    },
+    grey: {
+      color: theme.palette.getContrastText(grey[500]),
+      backgroundColor: grey[500],
+    },
+    blueG: {
+      color: theme.palette.getContrastText(blueGrey[500]),
+      backgroundColor: blueGrey[500],
+    },
+    successDark: {
+      color: theme.palette.getContrastText(theme.palette.success.dark),
+      backgroundColor: theme.palette.success.dark,
+    }
+  }));
   const classes = useStyles();
+  const badgeClasses = badgeStyles();
   const style = {
     lineHeight: 'normal',
     height: '128px',
@@ -336,7 +358,7 @@ const RepositoryBox = memo(function RepositoryBox({
               <Typography>{name}</Typography>
             }
           </Grid>
-          <Grid item xs={7}>
+          <Grid item xs={6}>
             <Grid container direction="row" justifyContent="felx-start" alignItems="center">
               {tokensList}
             </Grid>
@@ -344,9 +366,16 @@ const RepositoryBox = memo(function RepositoryBox({
           <Grid item xs={1}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
               {/* <Typography variant="caption" color="textSecondary">{t('ultimatum.box.total_label', { amount: amount })}</Typography> */}
-              <Badge color="secondary" badgeContent={amount} showZero>
-                <MonetizationOnIcon color={name === ItemTypes.PLAYER ? "primary" : "disabled"} fontSize="large" />
+              {/* <Typography variant="caption" color="textSecondary">Total <br /></Typography> */}
+              <Badge color="primary" overlap="circular" anchorOrigin={{ vertical: 'top', horizontal: 'left', }} badgeContent={amount} showZero>
+                <MonetizationOnIcon color={name === ItemTypes.PLAYER ? "secondary" : "disabled"} fontSize="large" />
               </Badge>
+            </Grid>
+          </Grid>
+          <Grid item xs={1}>
+            <Grid container direction="column" justifyContent="center" alignItems="center">
+              {/* <Typography variant="caption" color="textSecondary">Total <br /></Typography> */}
+              <Avatar className={name === ItemTypes.PLAYER ? badgeClasses.successDark : ''}>{amount}</Avatar>
             </Grid>
           </Grid>
         </Grid>
