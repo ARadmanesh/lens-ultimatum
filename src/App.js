@@ -19,7 +19,8 @@ import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { ltrTheme } from "./utils/theme";
 import { DndProvider, useDrag , useDrop} from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend'
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 //css
 import "./app.css";
@@ -41,6 +42,14 @@ const useStyles = makeStyles((theme) => ({
   },
   height100: {
     height: '100%',
+  },
+  grey: {
+    color: theme.palette.getContrastText(grey[500]),
+    backgroundColor: grey[500],
+  },
+  blueG: {
+    color: theme.palette.getContrastText(blueGrey[500]),
+    backgroundColor: blueGrey[500],
   }
 }));
 
@@ -53,8 +62,16 @@ const ItemTypes = {
 }
 
 export default function App() {
+  const isTouchScreen = () => {
+    return ( 'ontouchstart' in window ) ||
+           ( navigator.maxTouchPoints > 0 ) ||
+           ( navigator.msMaxTouchPoints > 0 );
+  }
+
   const classes = useStyles();
   const tokens = 10;
+  const isTouch = isTouchScreen();
+  console.log(isTouch);
   const [boxes, setBoxes] = useState(
     [
       {name: ItemTypes.OPPONENT , amount : 0, accepts: [ItemTypes.POT, ItemTypes.PLAYER]},
@@ -88,9 +105,11 @@ export default function App() {
   )
 
   const renderBoxes = () => {
+    var dndBackend = isTouchScreen() ? TouchBackend : HTML5Backend;
+    console.log(dndBackend);
     return (
       <Grid item container spacing={3}  alignItems='stretch' justifyContent='space-between' className='boxes-container'>
-        <DndProvider backend={TouchBackend} options={{enableMouseEvents: true}}>
+        <DndProvider backend={dndBackend} options={isTouchScreen()?{enableMouseEvents: true}:{}}>
           {boxes.map(({name, amount, accepts}, index) => (
             <RepositoryBox
               accept={accepts}
@@ -105,141 +124,6 @@ export default function App() {
     )
   }
 
-  const renderDemoBoxes = () => {
-    return (
-      <Fragment>
-        <Grid item xs={12}>
-          <Paper className={classes.paper} elevation={3} >
-            <Grid container direction="row">
-              <Grid item xs={4}>
-                  <Avatar alt="Marry Stone" src="/images/avatars/marry-avatar.jpg" className={classes.large} />
-                  <Typography variant="body1" color="textPrimary" component="p"> Marry Stone</Typography>
-                  <Typography variant="body2" color="textSecondary" component="p">27 years old</Typography>
-                  <Typography variant="body2" color="textSecondary" component="p">Nurse</Typography>
-              </Grid>
-              <Grid item xs={8}>
-                <Grid container direction="row" justifyContent="felx-start" alignItems="center" className={classes.height100}>
-                  <Grid item><MonetizationOnIcon role="Handle" data-test-id={`token`} /> </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid container direction='row' justifyContent="flex-end" alignItems='center'>
-              <Grid item>
-                <Typography variant="body2" color="textSecondary" component="span">Total: 12</Typography>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        {/* BOX */}
-        <Grid item xs={12}>
-          <Paper className={classes.paper} elevation={3}>
-            <Grid container direction='row' justifyContent="space-around" alignItems='center'>
-              <Grid item>
-                <Typography aligin>Player (12)</Typography>
-              </Grid>
-            </Grid>
-            <Grid container direction="row">
-              <Grid item xs={4}>
-                <Avatar alt="Marry Stone" src="/images/avatars/marry-avatar.jpg" className={classes.large} />
-                <Typography variant="body1" color="textPrimary" component="p"> Marry Stone</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">27 years old</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">Nurse</Typography>
-              </Grid>
-              <Grid item xs={8} className={classes.height100}>
-                  <MonetizationOnIcon key="1" />
-                  <MonetizationOnIcon key="2" />
-                  <MonetizationOnIcon key="3" />
-                  <MonetizationOnIcon key="4" />
-                  <MonetizationOnIcon key="5" />
-                  <MonetizationOnIcon key="6" />
-                  <MonetizationOnIcon key="7" />
-                  <MonetizationOnIcon key="8" />
-                  <MonetizationOnIcon key="9" />
-                  <MonetizationOnIcon key="10" />
-                  <span class="stack-badge">
-                    <Badge badgeContent={2} color="primary">
-                      <AttachMoneyIcon />
-                    </Badge>
-                  </span>
-              </Grid>
-            </Grid>
-            <Grid container direction='row' justifyContent="space-around" alignItems='center'>
-              <Grid item>
-                <Typography aligin>Total: 12</Typography>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        {/* BOX */}
-        <Grid item xs={12} spacing={2}>
-          <Paper className={classes.paper} elevation={3}>
-            <Grid container direction='row'>
-              <Grid item xs={12}>
-                <Avatar alt="Marry Stone" src="/images/avatars/marry-avatar.jpg" className={classes.large} />
-                <Typography variant="body1" color="textPrimary" component="p"> Marry Stone</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">27 years old</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">Nurse</Typography>
-                <Typography align='right'>Player (12)</Typography>
-              </Grid>
-              <Grid item  xs={12}>
-                    <MonetizationOnIcon key="1" />
-                    <MonetizationOnIcon key="2" />
-                    <MonetizationOnIcon key="3" />
-                    <MonetizationOnIcon key="4" />
-                    <MonetizationOnIcon key="5" />
-                    <MonetizationOnIcon key="6" />
-                    <MonetizationOnIcon key="7" />
-                    <MonetizationOnIcon key="8" />
-                    <MonetizationOnIcon key="9" />
-                    <MonetizationOnIcon key="10" />
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        {/* Box */}
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Typography>Pot (4)</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <div>
-                  <MonetizationOnIcon key="1" />
-                  <MonetizationOnIcon key="2" />
-                  <MonetizationOnIcon key="3" />
-                  <MonetizationOnIcon key="4" />
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                Total: 4
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        {/* Box */}
-        <Grid item xs={12}>
-          <Paper className="">
-            <Grid container>
-              <Grid item xs={12}>
-                <Typography>Opponent (2)</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <div>
-                  <MonetizationOnIcon key="1" />
-                  <MonetizationOnIcon key="2" />
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                Total: 2
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-      </Fragment>
-    )
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <div>
@@ -248,7 +132,7 @@ export default function App() {
         <LinearProgress variant="determinate" />
 
         <Container maxWidth="sm" className="study-container">
-          <Grid container spacing={2} direction="column" justify="flex-start" alignItems="stretch">
+          <Grid container spacing={2} direction="column" justifyContent="flex-start" alignItems="stretch">
             <Grid item>
               <Paper className="view-container">
                 {/* Here the study view starts */}
@@ -258,7 +142,6 @@ export default function App() {
                       <Typography variant="body2">opus irum doctorn ista manis ores fiendorus asten vaskaris</Typography>
                     </Grid>
                     {!useDemoPart && renderBoxes() }
-                    {useDemoPart && renderDemoBoxes() }
 
                     <Grid item container direction='row' justifyContent="space-around" alignItems='center'>
                       <Grid item><Grid container direction='column' justifyContent="space-around" alignItems='center'>
@@ -349,7 +232,7 @@ const RepositoryBox = memo(function RepositoryBox({
   return (
     <Grid item xs={12}>
       <Paper ref={drop} className={classes.paper} style={{ ...style, backgroundColor }} elevation={3} >
-        <Grid container alignItems="center" direction="row" className={classes.height100}>
+        <Grid container alignItems="center" justifyContent="center" direction="row" className={classes.height100}>
           <Grid item xs={4}>
             {name === ItemTypes.OPPONENT &&
               <OpponentInfoBar />
@@ -365,17 +248,8 @@ const RepositoryBox = memo(function RepositoryBox({
           </Grid>
           <Grid item xs={1}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
-              {/* <Typography variant="caption" color="textSecondary">{t('ultimatum.box.total_label', { amount: amount })}</Typography> */}
               {/* <Typography variant="caption" color="textSecondary">Total <br /></Typography> */}
-              <Badge color="primary" overlap="circular" anchorOrigin={{ vertical: 'top', horizontal: 'left', }} badgeContent={amount} showZero>
-                <MonetizationOnIcon color={name === ItemTypes.PLAYER ? "secondary" : "disabled"} fontSize="large" />
-              </Badge>
-            </Grid>
-          </Grid>
-          <Grid item xs={1}>
-            <Grid container direction="column" justifyContent="center" alignItems="center">
-              {/* <Typography variant="caption" color="textSecondary">Total <br /></Typography> */}
-              <Avatar className={name === ItemTypes.PLAYER ? badgeClasses.successDark : ''}>{amount}</Avatar>
+              <Avatar className={`${classes.small} ${name === ItemTypes.PLAYER ? badgeClasses.successDark : ''}`}>{amount}</Avatar>
             </Grid>
           </Grid>
         </Grid>
@@ -402,19 +276,22 @@ const MonetizedToken = memo(function MonetizedToken({type, name, boxName}) {
   const classes = useStyles();
   const style = {
     cursor: 'move',
-    color: 'black'
+    color: 'black',
+    backgroundColor: 'rbga(0,0,0,0)'
   }
 
-  const [collected, drag, dragPreview] = useDrag(
+  const [{ opacity }, drag] = useDrag(
     () => ({
       type,
       item: { name, boxName },
-    })
+      collect: (monitor) => ({
+        opacity: monitor.isDragging() ? 0.4 : 1,
+      }),
+    }),
+    [name],
   )
-  return collected.isDragging ? (
-   <Grid item><MonetizationOnIcon ref={dragPreview} style={{ opacity: 0.5}} /></Grid>
-  ) : (
-    <Grid item><MonetizationOnIcon ref={drag} {...collected} role="Handle" data-test-id={`token`} /> </Grid>
+  return (
+   <Grid item ><span ref={drag} role="Handle" className='token-span'> <MonetizationOnIcon style={{ ...style, opacity}} /> </span></Grid>
   )
     {/*
     <span ref={dragPreview} style={...style,{ opacity: isDragging ? 0.5 : 1}}>

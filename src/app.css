@@ -5,12 +5,21 @@
 .max-height{
   height: 100%;
 }
-
 .stack-badge{
   float: right;
   top: 5px;
   right: 5px;
 }
 .boxes-container{
+
+}
+.token-span{
+
+}
+.token-span:focus-visible{
+    outline: none;
+    outline-color: ;
+    outline-style: ;
+    outline-width: ;
 
 }
