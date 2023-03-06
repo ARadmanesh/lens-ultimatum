@@ -2,7 +2,7 @@
   "name": "lens-ultimatum",
   "version": "0.2.0",
   "private": false,
-  "homepage": "https://ARadmanesh.github.io/lens-ultimatum",
+  "homepage": "https://lens.dashkootek.site",
   "main": "index.js",
   "dependencies": {
     "@material-ui/core": "^4.9.10",

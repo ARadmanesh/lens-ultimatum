@@ -18,7 +18,7 @@ import { sizing } from '@material-ui/system';
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { ltrTheme } from "./utils/theme";
-import { DndProvider, useDrag , useDrop} from 'react-dnd';
+import { DndProvider, useDrag , useDrop, DragPreviewImage } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -179,28 +179,7 @@ const RepositoryBox = memo(function RepositoryBox({
   accept,
 })
 {
-  const badgeStyles = makeStyles((theme) => ({
-    root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
-    grey: {
-      color: theme.palette.getContrastText(grey[500]),
-      backgroundColor: grey[500],
-    },
-    blueG: {
-      color: theme.palette.getContrastText(blueGrey[500]),
-      backgroundColor: blueGrey[500],
-    },
-    successDark: {
-      color: theme.palette.getContrastText(theme.palette.success.dark),
-      backgroundColor: theme.palette.success.dark,
-    }
-  }));
-  const classes = useStyles();
-  const badgeClasses = badgeStyles();
+  const classes = useStyles(theme);
   const style = {
     lineHeight: 'normal',
     height: '128px',
@@ -221,7 +200,7 @@ const RepositoryBox = memo(function RepositoryBox({
   if (isActive) {
     backgroundColor = 'darkgreen'
   } else if (canDrop) {
-    backgroundColor = 'darkkhaki'
+    backgroundColor = blueGrey[800]
   }
 
   const tokensList = [];
@@ -241,16 +220,14 @@ const RepositoryBox = memo(function RepositoryBox({
               <Typography>{name}</Typography>
             }
           </Grid>
-          <Grid item xs={6}>
-            <Grid container direction="row" justifyContent="felx-start" alignItems="center">
+          <Grid item xs={7}>
+            <Grid container direction="row" justifyContent="flex-start" alignItems="center">
               {tokensList}
             </Grid>
           </Grid>
           <Grid item xs={1}>
-            <Grid container direction="column" justifyContent="center" alignItems="center">
               {/* <Typography variant="caption" color="textSecondary">Total <br /></Typography> */}
-              <Avatar className={`${classes.small} ${name === ItemTypes.PLAYER ? badgeClasses.successDark : ''}`}>{amount}</Avatar>
-            </Grid>
+              <Avatar className={[classes.small,classes.grey].join(' ')}>{amount}</Avatar>
           </Grid>
         </Grid>
       </Paper>
@@ -273,32 +250,26 @@ const OpponentInfoBar = memo(function OpponentInfoBar(){
  * Component which renders coin tokens and handles dragging events
  */
 const MonetizedToken = memo(function MonetizedToken({type, name, boxName}) {
-  const classes = useStyles();
+  const classes = useStyles(theme);
   const style = {
     cursor: 'move',
-    color: 'black',
     backgroundColor: 'rbga(0,0,0,0)'
   }
 
-  const [{ opacity }, drag] = useDrag(
+  const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type,
       item: { name, boxName },
       collect: (monitor) => ({
-        opacity: monitor.isDragging() ? 0.4 : 1,
+        isDragging: !!monitor.isDragging(),
       }),
     }),
     [name],
   )
   return (
-   <Grid item ><span ref={drag} role="Handle" className='token-span'> <MonetizationOnIcon style={{ ...style, opacity}} /> </span></Grid>
-  )
-    {/*
-    <span ref={dragPreview} style={...style,{ opacity: isDragging ? 0.5 : 1}}>
-      <span ref={drag} role="Handle" data-test-id={`token`}>
-        <MonetizationOnIcon  />
-      </span>
-    </span>
-    */}
-
+    <Grid item>
+      <DragPreviewImage connect={preview} src={process.env.PUBLIC_URL + "/images/token.png"} />
+      <span ref={drag} role="Handle" className='token-span' style={{ ...style, opacity: isDragging ? 0.5 : 1,}}> <MonetizationOnIcon /> </span>
+    </Grid>
+  );
 })
